@@ -1,0 +1,5 @@
+= wake
+
+Generate this with
+    wake rdoc
+After you have described your command line interface

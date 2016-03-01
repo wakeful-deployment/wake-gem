@@ -1,0 +1,6 @@
+= wake
+
+Describe your project here
+
+:include:wake.rdoc
+
