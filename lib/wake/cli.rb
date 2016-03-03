@@ -38,6 +38,7 @@ module CLI
     c.command :list do |c|
       c.action do |global_options, options, args|
         p ["clusters list", :global_options, global_options, :options, options, :args, args]
+        JSON.pretty_generate Cluster.list
       end
     end
 
@@ -59,6 +60,8 @@ module CLI
         help_now! "orchestrator is required" if options[:orchestrator].nil?
 
         p ["clusters create", :global_options, global_options, :options, options, :args, args]
+
+        Cluster.create name: args.first, iaas: options[:iaas], datacenter: options[:datacenter], orchestrator: options[:orchestrator]
       end
     end
 
@@ -67,6 +70,8 @@ module CLI
     c.command :delete do |c|
       c.action do |global_options, options, args|
         p ["clusters delete", :global_options, global_options, :options, options, :args, args]
+
+        Cluster.delete name: args.first
       end
     end
 
@@ -75,6 +80,8 @@ module CLI
     c.command :"set-default" do |c|
       c.action do |global_options, options, args|
         p ["clusters set-default", :global_options, global_options, :options, options, :args, args]
+
+        Cluster.set_default name: args.first
       end
     end
   end
@@ -90,11 +97,13 @@ module CLI
 
     c.action do |global_options, options, args|
       p ["build", :global_options, global_options, :options, options, :args, args]
+
+      Docker.build revision: options[:revision], push: options[:push]
     end
   end
 
-  desc 'Run a service from a container image in the cluster'
-  arg '<service>'
+  desc 'Run container images in the cluster'
+  arg '<name>'
   command :run do |c|
     c.desc 'Image to run'
     c.long_desc 'Image to run can be docker hub path or full URI to private registry'
@@ -109,10 +118,15 @@ module CLI
       help_now! "service is required" if options[:service].nil?
 
       p ["run", :global_options, global_options, :options, options, :args, args]
+
+      iaas = IaaS.fetch()
+      orchestrator = Orchestrator.fetch(iaas: iaas)
+      orchestrator.run(name: args.first, image: options[:image], amount: options[:amount])
     end
   end
 
   desc 'Rolling replace with a new container image for a service'
+  arg '<name>'
   command :upgrade do |c|
     c.desc 'New image to run'
     c.long_desc 'New image to run can be docker hub path or full URI to private registry'
@@ -126,10 +140,15 @@ module CLI
       help_now! "image is required" if options[:image].nil?
 
       p ["upgrade", :global_options, global_options, :options, options, :args, args]
+
+      iaas = IaaS.fetch()
+      orchestrator = Orchestrator.fetch(iaas: iaas)
+      orchestrator.upgrade(name: args.first, image: options[:image])
     end
   end
 
   desc 'Scale a service in a cluster'
+  arg '<name>'
   command :scale do |c|
     c.desc 'Amount desired running'
     c.long_desc 'Amount of desired containers - will either subtract or add from the current amount in the cluster'
@@ -139,6 +158,10 @@ module CLI
       help_now! "amount is required" if options[:amount].nil?
 
       p ["scale", :global_options, global_options, :options, options, :args, args]
+
+      iaas = IaaS.fetch()
+      orchestrator = Orchestrator.fetch(iaas: iaas)
+      orchestrator.scale(name: args.first, amount: options[:amount])
     end
   end
 
