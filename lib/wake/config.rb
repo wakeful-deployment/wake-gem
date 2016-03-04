@@ -1,7 +1,7 @@
 require 'singleton'
 require 'forwardable'
 require 'fileutils'
-require 'wake/config_formatter'
+require 'wake/terminal_formatter'
 
 class Config
   include Singleton
@@ -11,7 +11,7 @@ class Config
 
   def initialize
     @dir = File.expand_path(File.join("~", ".wake"))
-    @path = File.expand_path(File.join(CONFIG_DIR, "config"))
+    @path = File.expand_path(File.join(@dir, "config"))
 
     unless File.exists?(@path)
       FileUtils.mkdir_p(File.dirname(@path))
@@ -23,7 +23,7 @@ class Config
     @json_file = JSONFile.new(@path)
   end
 
-  delegate [:key?, :[], :[]=, :require, :update, :delete, :reload, :empty?, :to_hash] => :json_file
+  delegate [:key?, :[], :[]=, :get, :require, :update, :delete, :reload, :empty?, :to_hash] => :json_file
 
   def get_or_ask_for(key)
     json_file[key] || ask_for(key)
@@ -37,6 +37,6 @@ class Config
   end
 
   def format
-    ConfigFormatter.format_hash(to_hash)
+    TerminalFormatter.format_hash(to_hash).join("\n")
   end
 end

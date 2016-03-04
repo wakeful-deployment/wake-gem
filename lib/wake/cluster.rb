@@ -1,4 +1,5 @@
 require 'forwardable'
+require 'wake/terminal_formatter'
 
 class Cluster
   extend Forwardable
@@ -14,7 +15,7 @@ class Cluster
     "#<#{self.class.name} {#{name.inspect}}>"
   end
 
-  delegate [:key?, :[], :[]=, :require, :update, :delete, :reload, :empty?, :to_hash] => :json_file
+  delegate [:key?, :[], :[]=, :get, :require, :update, :delete, :reload, :empty?, :to_hash] => :json_file
 
   def iaas
     self["iaas"]
@@ -34,5 +35,9 @@ class Cluster
 
   def collaborators
     self["collaborators"] || []
+  end
+
+  def format
+    TerminalFormatter.format_hash(to_hash).join("\n")
   end
 end

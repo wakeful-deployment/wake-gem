@@ -1,4 +1,5 @@
-require 'wake/version.rb'
+require 'wake/version'
 
-# Add requires for other files you add to your project here, so
-# you just need to require this one file in your bin file
+Dir["#{File.expand_path("..", __FILE__)}/**/*.rb"].each do |file|
+  require file
+end

@@ -7,22 +7,22 @@ class Clusters
   include Singleton
 
   def initialize
-    @path = File.expand_path File.join(Config.instance.dir, "clusters")
+    @dir = File.expand_path File.join(Config.instance.dir, "clusters")
 
-    unless File.exists? @path
-      FileUtils.mkdir_p File.dirname(path)
+    unless File.exists? @dir
+      FileUtils.mkdir_p @dir
     end
   end
 
   def file_path(name)
-    File.join @path, "#{name}.json"
+    File.join @dir, "#{name}.json"
   end
 
   def get(name)
     load file_path(name)
   end
 
-  def load(name:, path)
+  def load(name = nil, path)
     if File.exists?(path)
       name ||= File.basename(path).split(".").first
       json_file = JSONFile.new path
@@ -38,6 +38,8 @@ class Clusters
         f << "{}"
       end
     end
+
+    get name
   end
 
   def default
@@ -46,8 +48,18 @@ class Clusters
 
   def all
     path = file_path "**/*"
-    Dir[path].each do |file|
+    Dir[path].map do |file|
       load file
+    end
+  end
+
+  def format
+    all.map do |cluster|
+      <<~EOF
+        #{cluster.name}:
+        #{cluster.format}
+        
+      EOF
     end
   end
 end

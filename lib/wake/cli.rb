@@ -1,5 +1,5 @@
 require 'json'
-require_relative './cluster'
+require 'wake/cluster'
 
 module CLI
   extend GLI::App
@@ -35,21 +35,22 @@ module CLI
 
   # commands
 
+  desc 'Open IRB with code pre-loaded'
+  command :console do |c|
+    c.action do |global_options, options, args|
+      require 'wake'
+      require 'irb'
+      ARGV.clear
+      IRB.start
+    end
+  end
+
   desc 'Manage known clusters'
   command :clusters do |c|
     c.desc 'List all known clusters'
     c.command :list do |c|
       c.action do |global_options, options, args|
-        clusters = Cluster.list
-        puts "#{clusters.count} cluster(s) total:"
-        puts if clusters.count > 0
-        clusters.each do |name, info|
-          puts "#{name}:"
-          puts JSON.pretty_generate(info).indent(2)
-          puts
-        end
-        puts if clusters.count > 0
-        puts "TODO: describe how to add an alreadying created cluster to this list"
+        puts Clusters.instance.format
       end
     end
 

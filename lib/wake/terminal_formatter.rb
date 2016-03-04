@@ -1,4 +1,4 @@
-module ConfigFormatter
+module TerminalFormatter
   module_function
 
   def format_string(value, keys)
