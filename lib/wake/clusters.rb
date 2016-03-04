@@ -7,7 +7,7 @@ class Clusters
   include Singleton
 
   def initialize
-    @path = File.expand_path File.join(Config.dir, "clusters")
+    @path = File.expand_path File.join(Config.instance.dir, "clusters")
 
     unless File.exists? @path
       FileUtils.mkdir_p File.dirname(path)
@@ -41,7 +41,7 @@ class Clusters
   end
 
   def default
-    get Config.get("default_cluster")
+    get Config.instance.get("default_cluster")
   end
 
   def all
