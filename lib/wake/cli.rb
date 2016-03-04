@@ -1,3 +1,6 @@
+require 'json'
+require_relative './cluster'
+
 module CLI
   extend GLI::App
 
@@ -37,8 +40,16 @@ module CLI
     c.desc 'List all known clusters'
     c.command :list do |c|
       c.action do |global_options, options, args|
-        p ["clusters list", :global_options, global_options, :options, options, :args, args]
-        JSON.pretty_generate Cluster.list
+        clusters = Cluster.list
+        puts "#{clusters.count} cluster(s) total:"
+        puts if clusters.count > 0
+        clusters.each do |name, info|
+          puts "#{name}:"
+          puts JSON.pretty_generate(info).indent(2)
+          puts
+        end
+        puts if clusters.count > 0
+        puts "TODO: describe how to add an alreadying created cluster to this list"
       end
     end
 
