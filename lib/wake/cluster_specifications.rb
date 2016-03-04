@@ -3,7 +3,7 @@ require 'wake/cluster'
 require 'wake/config'
 require 'wake-utils/json_file'
 
-class Clusters
+class ClusterSpecifications
   include Singleton
 
   def initialize
@@ -30,7 +30,13 @@ class Clusters
     end
   end
 
-  def create(name)
+  NAME_REGEX = /[a-z0-9-]+/
+
+  def create(name:, iaas:, datacenter:, orchestrator:, collaborators: [])
+    if name !~ NAME_REGEX
+      raise "Only lowercase letters, numbers, and hyphens are allowed for the names of clusters"
+    end
+
     path = file_path name
 
     unless File.exists? path
@@ -39,7 +45,15 @@ class Clusters
       end
     end
 
-    get name
+    cluster = get name
+
+    cluster.update("name", name)
+    cluster.update("iaas", iaas)
+    cluster.update("datacenter", datacenter)
+    cluster.update("orchestrator", orchestrator)
+    cluster.update("collaborators", collaborators)
+
+    cluster
   end
 
   def default

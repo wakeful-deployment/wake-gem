@@ -50,7 +50,7 @@ module CLI
     c.desc 'List all known clusters'
     c.command :list do |c|
       c.action do |global_options, options, args|
-        puts Clusters.instance.format
+        puts ClusterSpecifications.instance.format
       end
     end
 
@@ -73,7 +73,8 @@ module CLI
 
         p ["clusters create", :global_options, global_options, :options, options, :args, args]
 
-        Cluster.create name: args.first, iaas: options[:iaas], datacenter: options[:datacenter], orchestrator: options[:orchestrator]
+        spec = ClusterSpecifications.create name: args.first, iaas: options[:iaas], datacenter: options[:datacenter], orchestrator: options[:orchestrator]
+        Clusters.create spec
       end
     end
 
@@ -83,7 +84,7 @@ module CLI
       c.action do |global_options, options, args|
         p ["clusters delete", :global_options, global_options, :options, options, :args, args]
 
-        Cluster.delete name: args.first
+        Clusters.delete name: args.first
       end
     end
 
@@ -93,7 +94,7 @@ module CLI
       c.action do |global_options, options, args|
         p ["clusters set-default", :global_options, global_options, :options, options, :args, args]
 
-        Cluster.set_default name: args.first
+        Clusters.set_default name: args.first
       end
     end
   end

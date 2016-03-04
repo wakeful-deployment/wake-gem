@@ -1,7 +1,7 @@
 require 'forwardable'
 require 'wake-utils/terminal_formatter'
 
-class Cluster
+class ClusterSpecification
   extend Forwardable
 
   attr_reader :name, :json_file
