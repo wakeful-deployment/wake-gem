@@ -1,10 +1,12 @@
 require 'singleton'
-require 'wake/cluster'
+require 'wake/cluster_specification'
 require 'wake/config'
 require 'wake-utils/json_file'
 
 class ClusterSpecifications
   include Singleton
+
+  NAME_REGEX = /[a-z0-9-]+/.freeze
 
   def initialize
     @dir = File.expand_path File.join(Config.instance.dir, "clusters")
@@ -26,11 +28,9 @@ class ClusterSpecifications
     if File.exists?(path)
       name ||= File.basename(path).split(".").first
       json_file = JSONFile.new path
-      Cluster.new name, json_file
+      ClusterSpecification.new name, json_file
     end
   end
-
-  NAME_REGEX = /[a-z0-9-]+/
 
   def create(name:, iaas:, datacenter:, orchestrator:, collaborators: [])
     if name !~ NAME_REGEX
@@ -39,7 +39,9 @@ class ClusterSpecifications
 
     path = file_path name
 
-    unless File.exists? path
+    if File.exists? path
+      raise "Cluster #{name} already exists"
+    else
       File.open(path, mode: "w", universal_newline: true) do |f|
         f << "{}"
       end

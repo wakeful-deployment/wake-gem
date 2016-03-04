@@ -1,5 +1,5 @@
 require 'json'
-require 'wake/cluster'
+require 'wake/cluster_specification'
 
 module CLI
   extend GLI::App
@@ -71,10 +71,10 @@ module CLI
         help_now! "datacenter is required" if options[:datacenter].nil?
         help_now! "orchestrator is required" if options[:orchestrator].nil?
 
-        p ["clusters create", :global_options, global_options, :options, options, :args, args]
+        spec = ClusterSpecifications.instance.create name: args.first, iaas: options[:iaas], datacenter: options[:datacenter], orchestrator: options[:orchestrator]
 
-        spec = ClusterSpecifications.create name: args.first, iaas: options[:iaas], datacenter: options[:datacenter], orchestrator: options[:orchestrator]
-        Clusters.create spec
+        puts spec.format
+        # Clusters.create spec
       end
     end
 
