@@ -1,5 +1,5 @@
 require 'forwardable'
-require 'wake-utils/terminal_formatter'
+require 'wake/utils/terminal_formatter'
 
 class ClusterSpecification
   extend Forwardable

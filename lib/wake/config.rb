@@ -1,7 +1,7 @@
 require 'singleton'
 require 'forwardable'
 require 'fileutils'
-require 'wake-utils/terminal_formatter'
+require 'wake/utils/terminal_formatter'
 
 class Config
   include Singleton

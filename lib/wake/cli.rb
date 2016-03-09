@@ -39,6 +39,9 @@ module CLI
   command :console do |c|
     c.action do |global_options, options, args|
       require 'wake'
+      require 'wake-utils'
+      require 'wake-azure'
+
       require 'irb'
       ARGV.clear
       IRB.start

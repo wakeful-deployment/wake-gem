@@ -1,0 +1,1 @@
+require 'wake/azure'

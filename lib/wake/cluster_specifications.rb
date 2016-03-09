@@ -1,7 +1,7 @@
 require 'singleton'
 require 'wake/cluster_specification'
 require 'wake/config'
-require 'wake-utils/json_file'
+require 'wake/utils/json_file'
 
 class ClusterSpecifications
   include Singleton
