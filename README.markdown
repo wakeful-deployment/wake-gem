@@ -40,8 +40,6 @@ container image)
 
 # Concepts
 
-wake is broken up into these concepts:
-
 **cli**: implimentation of the command line interface
 
 **build**: responsible for building and pushing docker images and for
