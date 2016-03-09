@@ -1,19 +1,25 @@
 require 'shellwords'
-require 'wake/run'
-require 'wake/exec'
+require 'wake/config'
+require 'wake/utils/run'
+require 'wake/utils/exec'
 
-module Azure
+module Utils
   class SSH
+    include Log
+    include Run
+    include Exec
+    include Escape
+
     attr_reader :ip, :username, :command, :output, :error, :status
 
     def github_username
-      WakeConfig.get_or_ask_for("github.username")
+      Config.get_or_ask_for("github.username")
     end
 
     def initialize(ip:, username: github_username, command: nil, force_exec: false)
       @ip         = ip
       @username   = username
-      @command    = command && Wake.escape(command)
+      @command    = command && escape(command)
       @force_exec = force_exec
     end
 
@@ -38,12 +44,12 @@ module Azure
     end
 
     def call
-      Wake.log [:command, full_command]
+      log [:command, full_command]
 
       if command? && !force_exec?
         @output, @error, @status = run full_command
       else
-        Wake.exec full_command
+        exec full_command
       end
     end
 
