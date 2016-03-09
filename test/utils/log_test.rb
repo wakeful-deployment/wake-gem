@@ -84,4 +84,23 @@ describe Utils::Log do
     assert o.empty?
     assert_equal "** Error: something\n", e
   end
+
+  it "can be included and used" do
+    klass = Class.new do
+      include Utils::Log
+
+      def say_something
+        log "something"
+      end
+    end
+
+    Utils::Log.verbose = true
+
+    o, e = capture_std do
+      klass.new.say_something
+    end
+
+    assert_equal "something\n", o
+    assert e.empty?
+  end
 end

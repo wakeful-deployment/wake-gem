@@ -32,20 +32,20 @@ module Utils
     module_function
 
     def log(msg)
-      if verbose?
-        output msg
+      if Log.verbose?
+        Log.output msg
       end
     end
 
     def debug(msg)
-      if very_verbose?
-        output msg
+      if Log.very_verbose?
+        Log.output msg
       end
     end
 
     def error(msg)
       msg = "** Error: #{msg}"
-      output msg, io: $stderr
+      Log.output msg, io: $stderr
     end
   end
 end
