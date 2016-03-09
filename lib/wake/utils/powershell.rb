@@ -1,4 +1,4 @@
-module Powershell
+module Wake
   module_function
 
   def powershell?
