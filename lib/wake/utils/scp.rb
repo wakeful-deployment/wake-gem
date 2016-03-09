@@ -1,12 +1,16 @@
-require 'wake/run'
-require 'wake/powershell'
+require 'wake/config'
+require 'wake/utils/run'
+require 'wake/utils/powershell'
 
-module Azure
+module Utils
   class SCP
+    include Run
+    include Powershell
+
     attr_reader :ip, :local_path, :destination, :username
 
     def github_username
-      WakeConfig.get_or_ask_for("github.username")
+      Config.get_or_ask_for("github.username")
     end
 
     def initialize(ip:, local_path:, username: github_username, destination: "/home/#{username}")
@@ -15,7 +19,7 @@ module Azure
       @destination = destination
       @username = username
 
-      if Wake.powershell?
+      if powershell?
         @local_path.gsub!(/^(.):/) {"/#{$1}" }
       end
     end
