@@ -17,7 +17,7 @@ end
 require 'rake/testtask'
 Rake::TestTask.new do |t|
   t.libs << "test"
-  t.test_files = FileList['test/*_test.rb']
+  t.test_files = FileList['test/**/*_test.rb']
   # t.verbose = true
 end
 
@@ -38,17 +38,13 @@ task :crlf do
   end
 end
 
-begin
-  require 'rubocop/rake_task'
+require 'rubocop/rake_task'
 
-  desc 'Run RuboCop'
-  RuboCop::RakeTask.new(:rubocop) do |task|
-    task.patterns = ['**/*.rb']
-    task.formatters = ['files']
-    task.fail_on_error = false
-  end
-rescue LoadError
-  $stderr.puts "gem install rubocop to have access to those rake tasks"
+desc 'Run RuboCop'
+RuboCop::RakeTask.new(:rubocop) do |task|
+  task.patterns = ['**/*.rb']
+  task.formatters = ['files']
+  task.fail_on_error = false
 end
 
 task :format => [:crlf, :rubocop]
