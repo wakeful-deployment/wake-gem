@@ -1,4 +1,5 @@
 require 'open3'
+require 'monitor'
 require 'wake/utils/log'
 
 $stdout.sync = true
@@ -6,69 +7,115 @@ $stderr.sync = true
 
 module Utils
   module Run
-    @@buffers = {
-      out: "",
-      err: "",
-      current: :out
-    }
+    module_function
 
-    def self.current?(type)
-      @@buffers[:current] == type
+    def run(*args, **opts)
+      Command.new(*args, **opts).call
     end
 
-    def self.io(type)
-      if type == :out
-        $stdout
-      else
-        $stderr
-      end
+    def run!(cmd, *args, **opts)
+      Command.new(*args, **opts).call!
+    end
+  end
+
+  class CombinedStream
+    def initialize(stream1, stream2)
+      @stream1, @stream2 = stream1, stream2
     end
 
-    def self.swap(current_type)
-      if current_type == :out
-        :err
-      else
-        :out
-      end
+    def <<(stuff)
+      @stream1 << stuff
+      @stream2 << stuff
+    end
+  end
+
+  class Streamer
+    include MonitorMixin
+
+    def initialize(stream)
+      @stream = stream
+      @buffer = ""
+      @current = :none
+
+      super()
     end
 
-    def self.print(char, type)
-      io(type).tap do |std|
-        std.print char
-        std.flush
-      end
-    end
-
-    def self.output(char, std:)
-      @@buffers[std] << char # accumulate for later
-
-      if current? std
-        print char, std # print, since we are current
-
-        if char == ?\r || char == ?\n
-          # if we have a new line or return then clear out current buffer to singal a good time to swap
-          @@buffers[std].clear
+    def puts(stuff, type:)
+      synchronize do
+        if @current == :none
+          @current = type
         end
-      elsif @@buffers[swap(std)].empty?
-        # if the opposite buffer is empty, and we are not current, let's just become current
-        # the opposite buffer will be empty if there has been no output or if we just saw a new line or return
-        # (a clean break)
-        print @buffers[std], std # output all saved chars
-        @@buffers[:current] = std # swap current output for other output
+
+        if @current == type
+          @stream << stuff
+
+          last_char = stuff.chars.last
+
+          if last_char == ?\r || last_char == ?\n
+            flush_buffer_to_break
+
+            if @buffer.empty?
+              @current = :none
+            else
+              change_and_flush_buffer
+            end
+          end
+        else
+          @buffer << stuff
+        end
       end
     end
 
-    def self.flush
-      current = @@buffers[:current]
-      other   = swap(current)
-
-      print @@buffers[current], current unless @@buffers[current].empty?
-      print @@buffers[other],   other   unless @@buffers[other].empty?
+    def change_and_flush_buffer
+      if @current == :stdout
+        @current = :stderr
+      else
+        @current = :stdout
+      end
+      @stream << @buffer
+      @buffer.clear
     end
 
-    def self.run(cmd, streamer = nil, log: false)
-      force_log = log
-      Log.log "$ #{cmd}"
+    def flush_buffer_to_break
+      index = [@buffer.rindex(?\r), @buffer.rindex(?\n), -1].compact.max
+
+      if index > -1
+        part_to_flush = @buffer[0..index]
+        @buffer = @buffer[(index+1)..-1]
+        @stream << part_to_flush
+      end
+    end
+
+    def flush
+      @stream << @buffer unless @buffer.empty?
+      @buffer.clear
+      nil
+    end
+  end
+
+  class Command
+    include Log
+
+    attr_reader :cmd
+
+    def initialize(cmd, stream: nil)
+      @cmd = cmd
+
+      if stream
+        @streamer = Streamer.new(stream)
+      end
+    end
+
+    def stream(msg, type:)
+      @streamer.puts msg, type: type if @streamer
+    end
+
+    def flush_stream
+      @streamer.flush if @streamer
+    end
+
+    def call
+      log "$ #{cmd}"
 
       Open3.popen3(cmd) do |i, o, e, t|
         out = ""
@@ -77,10 +124,8 @@ module Utils
         out_thread = Thread.new do
           while stdout = o.read(1)
             if stdout
-              if Log.verbose? || force_log
-                output stdout, std: :out
-              end
               out << stdout
+              stream stdout, type: :stdout
             end
           end
         end
@@ -88,10 +133,8 @@ module Utils
         err_thread = Thread.new do
           while stderr = e.read(1)
             if stderr
-              if Log.verbose? || force_log
-                output stderr, std: :err
-              end
               err << stderr
+              stream stderr, type: :stderr
             end
           end
         end
@@ -99,12 +142,14 @@ module Utils
         out_thread.join
         err_thread.join
 
+        flush_stream
+
         [out, err, t.value]
       end
     end
 
-    def self.run!(cmd, *args, **opts)
-      out, err, code = run(cmd, *args, **opts)
+    def call!
+      out, err, code = call
 
       unless code.success?
         error_string = ""
@@ -120,7 +165,7 @@ module Utils
         fail "`#{cmd}` failed:\n#{error_string}"
       end
 
-      [out,err]
+      [out, err]
     end
   end
 end

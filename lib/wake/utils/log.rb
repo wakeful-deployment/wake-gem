@@ -37,6 +37,10 @@ module Utils
       end
     end
 
+    def <<(msg)
+      log msg
+    end
+
     def debug(msg)
       if Log.very_verbose?
         Log.output msg
