@@ -12,11 +12,11 @@ module Utils
       current: :out
     }
 
-    def current?(type)
+    def self.current?(type)
       @@buffers[:current] == type
     end
 
-    def io(type)
+    def self.io(type)
       if type == :out
         $stdout
       else
@@ -24,7 +24,7 @@ module Utils
       end
     end
 
-    def swap(current_type)
+    def self.swap(current_type)
       if current_type == :out
         :err
       else
@@ -58,7 +58,7 @@ module Utils
       end
     end
 
-    def flush
+    def self.flush
       current = @@buffers[:current]
       other   = swap(current)
 

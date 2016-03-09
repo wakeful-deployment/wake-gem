@@ -1,7 +1,9 @@
-module Wake
-  module_function
+module Utils
+  module Powershell
+    module_function
 
-  def powershell?
-    ENV.key?("ISPOWERSHELL")
+    def powershell?
+      ENV.key?("ISPOWERSHELL")
+    end
   end
 end
