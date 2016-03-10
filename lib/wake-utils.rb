@@ -1,1 +1,1 @@
-require 'wake/utils'
+require 'wake/utils/all'
