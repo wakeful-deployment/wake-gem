@@ -18,9 +18,10 @@ describe Utils::Run do
 
   it "captures stdoutd, stderr, and to a stream" do
     path_to_app = File.expand_path("../../fixtures/output_app.rb", __FILE__)
+    cmd = "ruby #{path_to_app}"
     stream = ""
 
-    o, e = Utils::Run.run("ruby #{path_to_app}", stream: stream)
+    o, e = Utils::Run.run(cmd, stream: stream)
 
     # only stars on stdout
     assert ["*"], o.lines.map(&:chomp).join.chars.uniq
@@ -29,6 +30,7 @@ describe Utils::Run do
 
     # ok, did it interleave it correctly
     assert_equal <<~EOF, stream.lines.sort.join
+      # $ #{cmd}
       $$$$$$$$$$
       $$$$$$$$$$
       $$$$$$$$$$

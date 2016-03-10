@@ -1,6 +1,5 @@
 require 'open3'
 require 'monitor'
-require 'wake/utils/log'
 
 $stdout.sync = true
 $stderr.sync = true
@@ -94,8 +93,6 @@ module Utils
   end
 
   class Command
-    include Log
-
     attr_reader :cmd
 
     def initialize(cmd, stream: nil)
@@ -115,7 +112,7 @@ module Utils
     end
 
     def call
-      log "$ #{cmd}"
+      stream "# $ #{cmd}\n", type: :stdout
 
       Open3.popen3(cmd) do |i, o, e, t|
         out = ""
