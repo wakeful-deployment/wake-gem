@@ -1,6 +1,6 @@
 module Utils
   module Text
-    def columnize(string)
+    def self.columnize(string)
       columnBoundary = string.lines.map{|line| line.split[0].length}.max
       string.lines.map do |line|
         tokens = line.split
@@ -8,7 +8,7 @@ module Utils
       end.join
     end
 
-    def indent(string, amount)
+    def self.indent(string, amount)
       string.lines.map do |line|
         spaces = " " * amount
         "#{spaces}#{line}"
