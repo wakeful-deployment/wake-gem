@@ -5,7 +5,5 @@ module Azure
     include Model
 
     required :id
-
-    # uri { URI("/subscriptions/#{id}") }
   end
 end

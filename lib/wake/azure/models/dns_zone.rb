@@ -10,7 +10,5 @@ module Azure
     def location
       "global"
     end
-
-    # uri { URI("#{resource_group.uri}/providers/Microsoft.Network/dnszones/#{name}") }
   end
 end

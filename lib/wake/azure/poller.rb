@@ -1,7 +1,15 @@
-require 'wake/azure/resources/request'
+require 'wake/azure/request'
 
 module Azure
   class Poller
+    def self.poll?(response)
+      fail NotImplementedError
+    end
+
+    def should_break?(response)
+      fail NotImplementedError
+    end
+
     Timeout = Class.new(StandardError)
 
     attr_reader :token, :uri, :timeout, :response
@@ -24,7 +32,7 @@ module Azure
         request.call
         response = request.response
 
-        if [200, 201, 204].include? response.status
+        if should_break?
           @response = response
           @state = :complete
           break

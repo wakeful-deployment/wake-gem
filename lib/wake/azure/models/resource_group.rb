@@ -7,7 +7,5 @@ module Azure
     parent   :subscription
     required :name
     required :location
-
-    # uri { URI("#{subscription.uri}/resourceGroups/#{name}") }
   end
 end

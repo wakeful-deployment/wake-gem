@@ -7,7 +7,5 @@ module Azure
     parent   :resource_group
     required :subnet
     optional :public_ip
-
-    # uri { URI("#{resource_group.uri}/providers/Microsoft.Network/networkInterfaces/#{name}") }
   end
 end

@@ -1,9 +1,12 @@
 require 'net/http'
 require 'json'
-require 'wake/azure/resources/response'
+require 'wake/azure/response'
+require 'wake/utils/log'
 
 module Azure
   class Request
+    include Utils::Log
+
     BASE_URI = URI("https://management.azure.com").freeze
 
     VERBS = {
@@ -73,7 +76,7 @@ module Azure
           request["Content-type"] = "application/json"
           request.body = if String === body then body else JSON.generate(body) end
 
-          Wake.debug request.body
+          debug request.body
         end
 
         @original_response = http.request request
@@ -104,12 +107,12 @@ module Azure
     end
 
     def call
-      Wake.log [uri, verb]
+      log [uri, verb]
 
       make_request
 
-      Wake.log [uri, @response.status]
-      Wake.debug @response.body
+      log [uri, @response.status]
+      debug @response.body
 
       @state = :complete
     end

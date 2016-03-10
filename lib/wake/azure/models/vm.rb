@@ -15,7 +15,5 @@ module Azure
     optional :admin_password, default: ->{ SecureRandom.urlsafe_base64(32) }
     optional :ssh_key_path,   default: ->(m){ "/home/#{m.admin_username}/.ssh/authorized_keys" }
     optional :ssh_public_key
-
-    # uri { URI("#{resource_group.uri}/providers/Microsoft.Compute/virtualMachines/#{name}") }
   end
 end

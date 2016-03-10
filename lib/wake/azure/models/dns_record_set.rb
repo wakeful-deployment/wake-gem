@@ -37,7 +37,5 @@ module Azure
     def location
       "global"
     end
-
-    # uri { URI("#{dns_zone.uri}/#{type}/#{name}") }
   end
 end

@@ -1,4 +1,4 @@
-require 'wake/azure/resources/action'
+require 'wake/azure/action'
 
 module Azure
   class Resource
