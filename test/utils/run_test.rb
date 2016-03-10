@@ -1,5 +1,4 @@
 require 'helper'
-require 'stub_config'
 require 'wake/utils/run'
 
 describe Utils::Run do
