@@ -1,15 +1,4 @@
 module Azure
-  module SubResource
-    def self.included(base)
-      base.include Model
-
-      base.instance_exec do
-        required :name
-        optional :location, default: ->{ parent.location }
-      end
-    end
-  end
-
   module Model
     MissingParent = Class.new(StandardError)
 
@@ -53,10 +42,6 @@ module Azure
         defaults[name] = default.freeze
         attr_reader name
       end
-
-      def uri(&blk)
-        define_method(:uri, &blk)
-      end
     end
 
     def self.included(base)
@@ -64,7 +49,9 @@ module Azure
     end
 
     def parent
-      if self.class.parent.nil?
+      if @parent
+        @parent
+      elsif self.class.parent.nil?
         fail MissingParent
       else
         send(self.class.parent)
@@ -73,8 +60,8 @@ module Azure
 
     def initialize(**opts)
       self.class.attributes.each do |name|
-        value = opts.delete(name)
-        instance_variable_set(:"@#{name}", value)
+        value = opts.delete name
+        instance_variable_set :"@#{name}", value
       end
 
       defaults = opts.delete(:defaults)
@@ -85,8 +72,8 @@ module Azure
           fail MissingParent, "::parent is not set on the class, cannot provide :parent argument during initialize"
         end
 
-        value = opts.delete(:parent)
-        instance_variable_set(:"@#{self.class.parent}", value)
+        value = opts.delete :parent
+        instance_variable_set :"@#{self.class.parent}", value
       end
 
       unless opts.empty?
@@ -118,20 +105,20 @@ module Azure
           default
         end
 
-        instance_variable_set(var_name, processed_default)
+        instance_variable_set var_name, processed_default
       end
     end
 
     def valid?
       values = self.class.required_attributes.map do |name|
-        instance_variable_get(:"@#{name}")
+        instance_variable_get :"@#{name}"
       end
 
       not values.any?(&:nil?)
     end
 
     def invalid?
-      !!valid?
+      !valid?
     end
   end
 end

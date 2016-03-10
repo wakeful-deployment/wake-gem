@@ -1,4 +1,3 @@
-require 'uri'
 require 'wake/azure/model'
 
 module Azure
@@ -7,6 +6,6 @@ module Azure
 
     required :id
 
-    uri { URI("/subscriptions/#{id}") }
+    # uri { URI("/subscriptions/#{id}") }
   end
 end

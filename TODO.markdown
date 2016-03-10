@@ -1,3 +1,7 @@
+# tests
+
+- [ ] use `capture_io` instead of the customer `capture_std`
+
 # utils
 
 - [x] Rename JSONFile to RequireableJSONFile
