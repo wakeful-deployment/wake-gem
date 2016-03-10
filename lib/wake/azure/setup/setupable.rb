@@ -1,6 +1,6 @@
 require 'erb'
 require 'tmpdir'
-require "wake/azure/ssh"
+require "wake/utils/ssh"
 
 module Azure
   module Setup

@@ -1,5 +1,5 @@
 require 'shellwords'
-require 'wake/azure/ssh'
+require 'wake/utils/ssh'
 require 'wake/config'
 
 module Azure

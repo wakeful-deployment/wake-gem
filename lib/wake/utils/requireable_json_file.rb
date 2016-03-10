@@ -1,8 +1,11 @@
+require "forwardable"
 require "json"
 require "wake/utils/requireable_hash"
 
 module Utils
-  class JSONFile
+  class RequireableJSONFile
+    extend Forwardable
+
     def initialize(path)
       @path = path
       @name = File.basename(path)
@@ -57,24 +60,14 @@ module Utils
       end
     end
 
-    def to_hash
-      @content
-    end
+    delegate [:key?, :[], :[]=, :get, :require, :update, :delete, :reload, :empty?, :to_hash, :each, :map] => :@content
 
     def reload
       open(:read) { |rh| @content = rh } && self
     end
 
-    def key?(key)
-      to_hash.key?(key)
-    end
-
-    def [](key)
-      to_hash[key]
-    end
-
     def []=(key, value)
-      to_hash.update(key, value)
+      update(key, value)
     end
 
     def require(key)
@@ -95,18 +88,6 @@ module Utils
         rh.delete(key)
         @content = rh
       end
-    end
-
-    def empty?
-      to_hash.nil? || to_hash.empty?
-    end
-
-    def each(&blk)
-      to_hash.each(&blk)
-    end
-
-    def map(&blk)
-      to_hash.map(&blk)
     end
   end
 end

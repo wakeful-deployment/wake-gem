@@ -1,7 +1,7 @@
 require 'singleton'
 require 'wake/cluster_specification'
 require 'wake/config'
-require 'wake/utils/json_file'
+require 'wake/utils/requireable_json_file'
 
 class ClusterSpecifications
   include Singleton
@@ -27,7 +27,7 @@ class ClusterSpecifications
   def load(name = nil, path)
     if File.exists?(path)
       name ||= File.basename(path).split(".").first
-      json_file = JSONFile.new path
+      json_file = Utils::RequireableJSONFile.new path
       ClusterSpecification.new name, json_file
     end
   end
@@ -49,11 +49,11 @@ class ClusterSpecifications
 
     cluster = get name
 
-    cluster.update("name", name)
-    cluster.update("iaas", iaas)
-    cluster.update("datacenter", datacenter)
-    cluster.update("orchestrator", orchestrator)
-    cluster.update("collaborators", collaborators)
+    cluster.update "name", name
+    cluster.update "iaas", iaas
+    cluster.update "datacenter", datacenter
+    cluster.update "orchestrator", orchestrator
+    cluster.update "collaborators", collaborators
 
     cluster
   end

@@ -10,7 +10,7 @@ module Utils
     attr_reader :ip, :local_path, :destination, :username
 
     def github_username
-      Config.get_or_ask_for("github.username")
+      Config.instance.get_or_ask_for("github.username")
     end
 
     def initialize(ip:, local_path:, username: github_username, destination: "/home/#{username}")

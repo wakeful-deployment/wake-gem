@@ -1,6 +1,6 @@
 require 'erb'
 require 'resolv'
-require 'wake/azure/scp'
+require 'wake/utils/scp'
 require 'wake/azure/provisioning_state_poller'
 require 'wake/azure/setup/dockerable'
 require 'wake/azure/setup/setupable'

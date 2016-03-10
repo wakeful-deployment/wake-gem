@@ -1,5 +1,7 @@
 require 'shellwords'
 require 'wake/config'
+require 'wake/utils/log'
+require 'wake/utils/escape'
 require 'wake/utils/run'
 require 'wake/utils/exec'
 

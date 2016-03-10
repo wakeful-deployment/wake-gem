@@ -2,6 +2,7 @@ require 'singleton'
 require 'forwardable'
 require 'fileutils'
 require 'wake/utils/terminal_formatter'
+require 'wake/utils/requireable_json_file'
 
 class Config
   include Singleton
@@ -9,21 +10,25 @@ class Config
 
   attr_reader :dir, :path, :json_file
 
-  def initialize
-    @dir = File.expand_path(File.join("~", ".wake"))
-    @path = File.expand_path(File.join(@dir, "config"))
+  def initialize(file = nil)
+    if file
+      @json_file = file
+    else
+      @dir = File.expand_path(File.join("~", ".wake"))
+      @path = File.expand_path(File.join(@dir, "config"))
 
-    unless File.exists?(@path)
-      FileUtils.mkdir_p(File.dirname(@path))
-      File.open(@path, mode: "w", universal_newline: true) do |f|
-        f << "{}"
+      unless File.exists?(@path)
+        FileUtils.mkdir_p(File.dirname(@path))
+        File.open(@path, mode: "w", universal_newline: true) do |f|
+          f << "{}"
+        end
       end
-    end
 
-    @json_file = JSONFile.new(@path)
+      @json_file = Utils::RequireableJSONFile.new(@path)
+    end
   end
 
-  delegate [:key?, :[], :[]=, :get, :require, :update, :delete, :reload, :empty?, :to_hash] => :json_file
+  delegate [:key?, :[], :[]=, :get, :require, :update, :delete, :reload, :empty?, :to_hash, :each, :map] => :json_file
 
   def get_or_ask_for(key)
     json_file[key] || ask_for(key)
