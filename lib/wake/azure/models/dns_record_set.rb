@@ -1,4 +1,3 @@
-require 'uri'
 require 'wake/azure/model'
 
 module Azure
@@ -39,6 +38,6 @@ module Azure
       "global"
     end
 
-    uri { URI("#{dns_zone.uri}/#{type}/#{name}") }
+    # uri { URI("#{dns_zone.uri}/#{type}/#{name}") }
   end
 end

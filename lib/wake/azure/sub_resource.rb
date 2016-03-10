@@ -1,4 +1,4 @@
-require "wake/azure/model"
+require "wake/azure/sub_resource"
 
 module Azure
   module SubResource

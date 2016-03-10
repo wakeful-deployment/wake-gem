@@ -48,10 +48,12 @@ module Azure
       base.extend ClassMethods
     end
 
+    def required_parent?
+      not self.class.parent.nil?
+    end
+
     def parent
-      if @parent
-        @parent
-      elsif self.class.parent.nil?
+      if self.class.parent.nil?
         fail MissingParent
       else
         send(self.class.parent)
@@ -110,6 +112,11 @@ module Azure
     end
 
     def valid?
+      if required_parent?
+        # return early if the parent is not valid
+        return false unless parent.valid?
+      end
+
       values = self.class.required_attributes.map do |name|
         instance_variable_get :"@#{name}"
       end

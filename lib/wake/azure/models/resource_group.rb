@@ -1,4 +1,3 @@
-require 'uri'
 require 'wake/azure/model'
 
 module Azure
@@ -9,6 +8,6 @@ module Azure
     required :name
     required :location
 
-    uri { URI("#{subscription.uri}/resourceGroups/#{name}") }
+    # uri { URI("#{subscription.uri}/resourceGroups/#{name}") }
   end
 end

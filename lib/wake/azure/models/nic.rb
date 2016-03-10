@@ -1,5 +1,4 @@
-require 'uri'
-require 'wake/azure/model'
+require 'wake/azure/sub_resource'
 
 module Azure
   class NIC
@@ -9,6 +8,6 @@ module Azure
     required :subnet
     optional :public_ip
 
-    uri { URI("#{resource_group.uri}/providers/Microsoft.Network/networkInterfaces/#{name}") }
+    # uri { URI("#{resource_group.uri}/providers/Microsoft.Network/networkInterfaces/#{name}") }
   end
 end

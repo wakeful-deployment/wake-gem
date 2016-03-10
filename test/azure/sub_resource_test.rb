@@ -11,6 +11,7 @@ describe Azure::SubResource do
 
   let(:thing) do
     Class.new do
+      include Azure::Model
       def location; "somewhere" end
     end.new
   end

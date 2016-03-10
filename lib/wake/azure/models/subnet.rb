@@ -1,5 +1,4 @@
-require 'uri'
-require 'wake/azure/model'
+require 'wake/azure/sub_resource'
 
 module Azure
   class Subnet
@@ -8,6 +7,6 @@ module Azure
     parent   :vnet
     optional :address_prefix, default: "10.1.0.0/16"
 
-    uri { URI("#{vnet.uri}/subnets/#{name}") }
+    # uri { URI("#{vnet.uri}/subnets/#{name}") }
   end
 end

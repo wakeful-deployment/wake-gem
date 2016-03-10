@@ -22,6 +22,7 @@ describe Azure::Model do
 
   let(:thing) do
     Class.new do
+      include Azure::Model
       def location; "somewhere" end
     end.new
   end
@@ -44,9 +45,21 @@ describe Azure::Model do
       k = klass.new id: 1, other_thing: thing
       assert_equal "somewhere", k.location
     end
+
+    it "is not valid unless its parent is valid" do
+      thing.stub(:valid?, false) do
+        k = klass.new id: 1, parent: thing
+        assert k.invalid?
+      end
+    end
   end
 
   describe "simpler klass" do
+    it "works" do
+      k = simpler_klass.new id: 1
+      assert k.valid?
+    end
+
     it "is invalid without an id" do
       k = simpler_klass.new
       assert k.invalid?

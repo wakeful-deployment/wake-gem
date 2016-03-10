@@ -1,5 +1,4 @@
-require 'uri'
-require 'wake/azure/model'
+require 'wake/azure/sub_resource'
 
 module Azure
   class PublicIP
@@ -7,6 +6,6 @@ module Azure
 
     parent :resource_group
 
-    uri { URI("#{resource_group.uri}/providers/Microsoft.Network/publicIPAddresses/#{name}") }
+    # uri { URI("#{resource_group.uri}/providers/Microsoft.Network/publicIPAddresses/#{name}") }
   end
 end
