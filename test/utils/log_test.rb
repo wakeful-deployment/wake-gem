@@ -8,7 +8,7 @@ describe Utils::Log do
   end
 
   it "outputs to stdout by default" do
-    o, e = capture_std do
+    o, e = capture_io do
       Utils::Log.output("something")
     end
 
@@ -17,7 +17,7 @@ describe Utils::Log do
   end
 
   it "can output to stderr" do
-    o, e = capture_std do
+    o, e = capture_io do
       Utils::Log.output("something", io: $stderr)
     end
 
@@ -26,7 +26,7 @@ describe Utils::Log do
   end
 
   it "doesn't log by default" do
-    o, e = capture_std do
+    o, e = capture_io do
       Utils::Log.log("something")
     end
 
@@ -37,7 +37,7 @@ describe Utils::Log do
   it "logs to stdout if verbose" do
     Utils::Log.verbose = true
 
-    o, e = capture_std do
+    o, e = capture_io do
       Utils::Log.log("something")
     end
 
@@ -46,7 +46,7 @@ describe Utils::Log do
   end
 
   it "doesn't debug by default" do
-    o, e = capture_std do
+    o, e = capture_io do
       Utils::Log.debug("something")
     end
 
@@ -57,7 +57,7 @@ describe Utils::Log do
   it "doesn't debug when verbose" do
     Utils::Log.verbose = true
 
-    o, e = capture_std do
+    o, e = capture_io do
       Utils::Log.debug("something")
     end
 
@@ -68,7 +68,7 @@ describe Utils::Log do
   it "debugs to stdout if very verbose" do
     Utils::Log.very_verbose = true
 
-    o, e = capture_std do
+    o, e = capture_io do
       Utils::Log.debug("something")
     end
 
@@ -77,7 +77,7 @@ describe Utils::Log do
   end
 
   it "errors to stderr" do
-    o, e = capture_std do
+    o, e = capture_io do
       Utils::Log.error("something")
     end
 
@@ -96,7 +96,7 @@ describe Utils::Log do
 
     Utils::Log.verbose = true
 
-    o, e = capture_std do
+    o, e = capture_io do
       klass.new.say_something
     end
 

@@ -1,6 +1,6 @@
 # tests
 
-- [ ] use `capture_io` instead of the customer `capture_std`
+- [x] use `capture_io` instead of the customer `capture_std`
 
 # utils
 
@@ -10,4 +10,6 @@
 
 ## azure
 
+- [ ] Tests for model
+- [ ] Move the uri logic out of the models and into the http part
 - [ ] Make Resources and Actions real objects instead of using a DSL
