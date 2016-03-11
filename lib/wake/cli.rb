@@ -1,3 +1,6 @@
+require 'json'
+require 'wake/cluster_specification'
+
 module CLI
   extend GLI::App
 
@@ -32,13 +35,25 @@ module CLI
 
   # commands
 
+  desc 'Open IRB with code pre-loaded'
+  command :console do |c|
+    c.action do |global_options, options, args|
+      require 'wake'
+      require 'wake/utils/all'
+      require 'wake/azure/all'
+
+      require 'irb'
+      ARGV.clear
+      IRB.start
+    end
+  end
+
   desc 'Manage known clusters'
   command :clusters do |c|
     c.desc 'List all known clusters'
     c.command :list do |c|
       c.action do |global_options, options, args|
-        p ["clusters list", :global_options, global_options, :options, options, :args, args]
-        JSON.pretty_generate Cluster.list
+        puts ClusterSpecifications.instance.format
       end
     end
 
@@ -59,9 +74,10 @@ module CLI
         help_now! "datacenter is required" if options[:datacenter].nil?
         help_now! "orchestrator is required" if options[:orchestrator].nil?
 
-        p ["clusters create", :global_options, global_options, :options, options, :args, args]
+        spec = ClusterSpecifications.instance.create name: args.first, iaas: options[:iaas], datacenter: options[:datacenter], orchestrator: options[:orchestrator]
 
-        Cluster.create name: args.first, iaas: options[:iaas], datacenter: options[:datacenter], orchestrator: options[:orchestrator]
+        puts spec.format
+        # Clusters.create spec
       end
     end
 
@@ -71,7 +87,7 @@ module CLI
       c.action do |global_options, options, args|
         p ["clusters delete", :global_options, global_options, :options, options, :args, args]
 
-        Cluster.delete name: args.first
+        Clusters.delete name: args.first
       end
     end
 
@@ -81,7 +97,7 @@ module CLI
       c.action do |global_options, options, args|
         p ["clusters set-default", :global_options, global_options, :options, options, :args, args]
 
-        Cluster.set_default name: args.first
+        Clusters.set_default name: args.first
       end
     end
   end
