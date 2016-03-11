@@ -3,7 +3,7 @@ require 'minitest/rg'
 require 'webmock/minitest'
 require 'stub_config'
 
-WebMock.disable_net_connect!(net_http_connect_on_start: true)
+WebMock.disable_net_connect!
 
 class Minitest::Test
   # add global helpers here

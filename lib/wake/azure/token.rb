@@ -3,9 +3,9 @@ module Azure
     attr_reader :type, :expires_on, :resource, :access_token
 
     def initialize(type:, expires_on:, resource:, access_token:)
-      @type = type
-      @expires_on = expires_on
-      @resource = resource
+      @type         = type
+      @expires_on   = expires_on
+      @resource     = resource
       @access_token = access_token
     end
 
@@ -23,9 +23,9 @@ module Azure
 
     def to_hash
       {
-        type: type,
-        expires_on: expires_on,
-        resource: resource,
+        type:         type,
+        expires_on:   expires_on,
+        resource:     resource,
         access_token: access_token
       }
     end

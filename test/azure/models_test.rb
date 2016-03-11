@@ -1,10 +1,8 @@
 require "helper"
 require "wake/azure/models"
 
-module Wrapper
-  include Azure
-
-  describe Azure do
+module Azure
+  describe "models" do
     let(:valid_resource_group) do
       ResourceGroup.new parent: Azure.subscription, name: "foo", location: Azure.datacenters.first
     end

@@ -5,6 +5,10 @@ require 'wake/utils/log'
 
 module Azure
   class Request
+    TIMEOUT_EXCEPTIONS = [Timeout::Error, Errno::ETIMEDOUT]
+    NETWORK_EXCEPTIONS = [Errno::EINVAL, Errno::ECONNRESET, EOFError, Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError]
+    ALL_EXCEPTIONS = TIMEOUT_EXCEPTIONS + NETWORK_EXCEPTIONS
+
     AlreadyComplete = Class.new(StandardError)
 
     include Utils::Log
@@ -88,8 +92,7 @@ module Azure
         body:    original_response.body,
         headers: original_response.to_hash
       })
-
-    rescue => e
+    rescue *ALL_EXCEPTIONS => e
       @original_response = nil
 
       response_body = JSON.generate({
@@ -100,7 +103,7 @@ module Azure
         }
       })
 
-      response_code = if Errno::ETIMEDOUT === e then "504" else "599" end
+      response_code = if TIMEOUT_EXCEPTIONS.any? { |te| te === e } then "504" else "599" end
 
       @response = Response.new({
         request: self,
