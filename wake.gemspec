@@ -19,5 +19,7 @@ spec = Gem::Specification.new do |s|
   s.add_development_dependency('rdoc')
   s.add_development_dependency('rubocop')
   s.add_development_dependency('minitest')
+  s.add_development_dependency('minitest-rg')
+  s.add_development_dependency('webmock')
   s.add_runtime_dependency('gli', '~> 2.13.4')
 end

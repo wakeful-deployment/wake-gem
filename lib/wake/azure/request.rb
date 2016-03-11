@@ -5,16 +5,18 @@ require 'wake/utils/log'
 
 module Azure
   class Request
+    AlreadyComplete = Class.new(StandardError)
+
     include Utils::Log
 
     BASE_URI = URI("https://management.azure.com").freeze
 
     VERBS = {
-      head: Net::HTTP::Head,
-      get: Net::HTTP::Get,
-      post: Net::HTTP::Post,
-      put: Net::HTTP::Put,
-      patch: Net::HTTP::Patch,
+      head:   Net::HTTP::Head,
+      get:    Net::HTTP::Get,
+      post:   Net::HTTP::Post,
+      put:    Net::HTTP::Put,
+      patch:  Net::HTTP::Patch,
       delete: Net::HTTP::Delete
     }.freeze
 
@@ -23,11 +25,11 @@ module Azure
     attr_reader :token, :verb, :body, :headers, :original_response, :response
 
     def initialize(token:, uri:, verb:, body: nil, headers: {})
-      @state = :pending
-      @token = token
-      @uri = uri
-      @verb = verb
-      @body = body
+      @state   = :pending
+      @token   = token
+      @uri     = uri
+      @verb    = verb
+      @body    = body
       @headers = headers
     end
 
@@ -62,11 +64,10 @@ module Azure
 
     private def make_request
       Net::HTTP.start(uri.host, uri.port, use_ssl: (uri.scheme == 'https')) do |http|
-        klass = VERBS[verb]
-        request = klass.new uri
+        request = VERBS[verb].new uri
 
         request["Authorization"] = token.to_header
-        request["Accept"] = "application/json"
+        request["Accept"]        = "application/json"
 
         headers.each do |k, v|
           request[k] = v
@@ -75,17 +76,18 @@ module Azure
         if BODIES.include?(verb) && body
           request["Content-type"] = "application/json"
           request.body = if String === body then body else JSON.generate(body) end
-
           debug request.body
         end
 
         @original_response = http.request request
       end
 
-      @response = Response.new(request: self,
-                               code: original_response.code,
-                               body: original_response.body,
-                               headers: original_response.to_hash)
+      @response = Response.new({
+        request: self,
+        code:    original_response.code,
+        body:    original_response.body,
+        headers: original_response.to_hash
+      })
 
     rescue => e
       @original_response = nil
@@ -100,13 +102,17 @@ module Azure
 
       response_code = if Errno::ETIMEDOUT === e then "504" else "599" end
 
-      @response = Response.new(request: self,
-                               code: response_code,
-                               body: response_body,
-                               headers: {})
+      @response = Response.new({
+        request: self,
+        code:    response_code,
+        body:    response_body,
+        headers: {}
+      })
     end
 
     def call
+      fail AlreadyComplete if @state == :complete
+
       log [uri, verb]
 
       make_request
